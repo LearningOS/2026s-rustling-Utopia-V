@@ -1,0 +1,1 @@
+Map<std::slice::Iter<'_, &str>, {closure@exercises/iterators/iterators2.rs:28:14: 28:20}>
