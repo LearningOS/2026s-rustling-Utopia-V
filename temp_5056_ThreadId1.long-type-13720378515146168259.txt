@@ -1,0 +1,1 @@
+for<'a> fn(&'a Arc<_, _>) -> Arc<_, _> {<Arc<_, _> as Clone>::clone}
