@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,14 +68,57 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
+
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
+	where
+        T: PartialOrd,
+    {   
+        let mut list_c = Self {
+            length: list_a.length + list_b.length,
             start: None,
             end: None,
+        };
+
+        let mut curr_a = list_a.start;
+        let mut curr_b = list_b.start;
+        let mut tail: Option<NonNull<Node<T>>> = None;
+
+        while let (Some(ptr_a), Some(ptr_b)) = (curr_a, curr_b) {
+            let val_a = unsafe { &(*ptr_a.as_ptr()).val };
+            let val_b = unsafe { &(*ptr_b.as_ptr()).val };
+
+            let next_node;
+            if val_a < val_b {
+                next_node = ptr_a;
+                curr_a = unsafe { (*ptr_a.as_ptr()).next };
+            } else {
+                next_node = ptr_b;
+                curr_b = unsafe { (*ptr_b.as_ptr()).next };
+            }
+
+            if let Some(t) = tail {
+                unsafe { (*t.as_ptr()).next = Some(next_node) };
+            } else {
+                list_c.start = Some(next_node);
+            }
+            tail = Some(next_node);
         }
+
+        let remainder = if curr_a.is_some() { curr_a } else { curr_b };
+        let remainder_end = if curr_a.is_some() { list_a.end } else { list_b.end };
+
+        if let Some(t) = tail {
+            unsafe { (*t.as_ptr()).next = remainder };
+            list_c.end = remainder_end;
+        } else {
+            list_c.start = remainder;
+            list_c.end = remainder_end;
+        }
+
+		list_a.start = None; list_a.end = None; list_a.length = 0;
+		list_b.start = None; list_b.end = None; list_b.length = 0;
+        
+        list_c
 	}
 }
 
